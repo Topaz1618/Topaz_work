@@ -18,8 +18,13 @@ cd /usr/local/redis-3.2.0/
 cp redis.conf redis.conf.ori  
 #注释太多看着心烦去掉
 egrep -v "^$|^#" redis.conf.ori >redis.conf 
-#修改为后台启动，一会儿集群要用到这个文件，改这个集群就省事了~
+#修改为后台启动
 sed -i "s#daemonize no#daemonize yes#g" redis.conf 
+#一会儿要把这个配置文件复制到各个集群节点，以下几项是集群需要的配置，先在这里配好，一会儿就省事了~
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
 
 
 ##开始搭集群，安装依赖
@@ -28,13 +33,29 @@ gem install redis
 #给节点创建目录
 mkdir /data/{7000..7005} -p
 #把redis.conf拷到各个目录下
-cp /usr/local/redis-3.2.0/redis.conf /data/7000
+cp /usr/local/redis-3.2.0/redis.conf 
 cp /usr/local/redis-3.2.0/redis.conf /data/7001
 cp /usr/local/redis-3.2.0/redis.conf /data/7002
 cp /usr/local/redis-3.2.0/redis.conf /data/7003
 cp /usr/local/redis-3.2.0/redis.conf /data/7004
 cp /usr/local/redis-3.2.0/redis.conf /data/7005
-#到每个节点目录下修改以下两项，端口对应目录名，bind后改成本机ip
-bind 10.0.0.111
-port 7001 
-
+#到每个节点目录下修改以下两项，bind:本机ip，端口对应目录名
+vim /data/7000/redis.conf
+  bind 10.0.0.111
+  port 7001 
+#起服务,必须到每个节点目录下，不然溜得飞起的起一圈，最后检查端口的时候你会发现自己啥也没干，对一个没起来。。
+cd /data/7000
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+cd /data/7001
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+cd /data/7002
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+cd /data/7003
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+cd /data/7004
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+cd /data/7005
+/usr/local/redis-3.2.0/src/redis-server redis.conf
+#创建集群
+/usr/local/redis-3.2.0/src/redis-trib.rb  create  --replicas 1 10.0.0.111:7000 10.0.0.111:7001 10.0.0.111:7002 10.0.0.111:7003 10.0.0.111:7004 10.0.0.111:7005
+##出现两个ok就功德圆满了，报错的话，恩，看报错解决吧~
