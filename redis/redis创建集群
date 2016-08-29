@@ -26,9 +26,6 @@ cluster-config-file nodes.conf
 cluster-node-timeout 5000
 appendonly yes
 
-#生产环境的redis.conf一份儿
-https://github.com/Topaz1618/Topaz_work/blob/master/redis/redis.conf
-
 ##开始搭集群，安装依赖
 yum install ruby ruby-devel rubygems rpm-build
 gem install redis
@@ -61,3 +58,10 @@ cd /data/7005
 #创建集群
 /usr/local/redis-3.2.0/src/redis-trib.rb  create  --replicas 1 10.0.0.111:7000 10.0.0.111:7001 10.0.0.111:7002 10.0.0.111:7003 10.0.0.111:7004 10.0.0.111:7005
 ##出现两个ok就功德圆满了，报错的话，恩，看报错解决吧~
+
+#生产环境下redis集群的redis.conf
+https://github.com/Topaz1618/Topaz_work/blob/master/redis/redis.conf
+#redis起集群脚本
+https://github.com/Topaz1618/Topaz_work/blob/master/redis/redis_start.sh
+#redis停集群脚本
+https://github.com/Topaz1618/Topaz_work/blob/master/redis/redis_stop.sh
