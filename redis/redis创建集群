@@ -11,7 +11,7 @@ make && make install
 cd /usr/local/redis-3.2.0/
 /usr/local/redis-3.2.0/src/redis-server redis.conf
 
-到这里就搭建成功了，是不是出现了很尴尬的界面呢，修改配置文件的参数，让它后台启动。
+到这里redis就搭建成功了，是不是起服务的方式有点放肆呢，修改配置文件的参数，让它后台启动。
 [root@shopapp2 redis-3.2.0]# pwd
 /usr/local/redis-3.2.0
 #先备份一个
@@ -20,3 +20,21 @@ cp redis.conf redis.conf.ori
 egrep -v "^$|^#" redis.conf.ori >redis.conf 
 #修改为后台启动，一会儿集群要用到这个文件，改这个集群就省事了~
 sed -i "s#daemonize no#daemonize yes#g" redis.conf 
+
+
+##开始搭集群，安装依赖
+yum install ruby ruby-devel rubygems rpm-build
+gem install redis
+#给节点创建目录
+mkdir /data/{7000..7005} -p
+#把redis.conf拷到各个目录下
+cp /usr/local/redis-3.2.0/redis.conf /data/7000
+cp /usr/local/redis-3.2.0/redis.conf /data/7001
+cp /usr/local/redis-3.2.0/redis.conf /data/7002
+cp /usr/local/redis-3.2.0/redis.conf /data/7003
+cp /usr/local/redis-3.2.0/redis.conf /data/7004
+cp /usr/local/redis-3.2.0/redis.conf /data/7005
+#到每个节点目录下修改以下两项，端口对应目录名，bind后改成本机ip
+bind 10.0.0.111
+port 7001 
+
