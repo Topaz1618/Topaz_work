@@ -20,12 +20,14 @@ cp redis.conf redis.conf.ori
 egrep -v "^$|^#" redis.conf.ori >redis.conf 
 #修改为后台启动
 sed -i "s#daemonize no#daemonize yes#g" redis.conf 
-#一会儿要把这个配置文件复制到各个集群节点，以下几项是集群需要的配置，先在这里配好，一会儿就省事了~
+#在redis.conf修改以下几项，为一会儿创建集群做准备
 cluster-enabled yes
 cluster-config-file nodes.conf
 cluster-node-timeout 5000
 appendonly yes
 
+#生产环境的redis.conf一份儿
+https://github.com/Topaz1618/Topaz_work/blob/master/redis/redis.conf
 
 ##开始搭集群，安装依赖
 yum install ruby ruby-devel rubygems rpm-build
