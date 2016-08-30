@@ -43,6 +43,6 @@ ba13cf3bde7f9540bc1531ad0cf803ffe0bf2250 192.168.100.34:7002 master - 0 14714927
 
 ##添加从节点
 /usr/local/redis-3.2.0/src/redis-trib.rb add-node --slave --master-id [node id] 192.168.100.111:7002 [master ip]:[port]
-node id:主节点的node id,选谁就是谁的从节点。先执行上面的命令，看主节点的node id，另外防止有的主节点没有从节点，有的一嘟噜从节点。
+node id:主节点的node id,选谁就是谁的从节点。先执行上面的命令，看主节点的node id，另外防止有的主节点没有从节点，有的全是从节点。
 master ip:集群节点的ip
-port：任意port，这作用就是制定集群。
+port：任意port，起到指定集群的作用。
