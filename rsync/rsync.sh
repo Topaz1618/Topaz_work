@@ -72,7 +72,7 @@ chmod 600 $Password_file &&\
 chown -R rsync.rsync /Release/rsync &&\
 action "Welcome to the Rsync!!" /bin/true
 
-################ client example ####################
+#####（对，客户端的配置，写在了这里。只有两步操作：配权限和写个只有密码的文件）#########
 #ll /etc/rsync.password 
 #-rw------- 1 root root 7 Jul 29 10:07 /etc/rsync.password
 #cat /etc/rsync.password 
