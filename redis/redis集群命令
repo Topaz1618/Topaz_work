@@ -28,11 +28,6 @@ M: d29989afbf3c14c7efdd08620ddefcf016cc9251 192.168.100.34:7005
 192.168.100.34:7000> 
 
 ##节点node id，从属查看
-随便连个集群端口，出来了一大串子信息是不是有点懵逼呢，其实很简单
-第一列：node id
-第二列：Ip Port
-第三列：角色master或slave
-第四列：slave后接它属于的主节点的node id，也就是说7004是7001的从节点，可以看出来的伐？
 [root@Topaz src]# ./redis-cli -h 192.168.100.34 -p 7003 cluster nodes
 2705c2ed7b4fdb54c114ccafea7d9daaa0926c56 192.168.100.34:7000 master - 0 1471492700496 1 connected 0-5460
 f240c8229fc0ee044d42b03f5c4ce26d4c9517af 192.168.100.34:7004 slave 2ebe9e2cb72b9103a190afa71e3ca290ad1b6573 0 1471492699995 5 connected
@@ -40,6 +35,11 @@ ba13cf3bde7f9540bc1531ad0cf803ffe0bf2250 192.168.100.34:7002 master - 0 14714927
 2ebe9e2cb72b9103a190afa71e3ca290ad1b6573 192.168.100.34:7001 master - 0 1471492700496 2 connected 5461-10922
 2d053828d63cd96334b9140b408940520ba4bca6 192.168.100.34:7003 myself,slave 2705c2ed7b4fdb54c114ccafea7d9daaa0926c56 0 0 4 connected
 1ebd5c8e0b4c36a9732c6e8082287f5e2a950045 :0 slave,fail,noaddr ba13cf3bde7f9540bc1531ad0cf803ffe0bf2250 1471491985114 1471491983111 6 disconnected
+随便连个集群端口，出来了一大串子信息是不是有点懵逼呢，其实很简单
+第一列：node id
+第二列：Ip Port
+第三列：角色master或slave
+第四列：slave后接它属于的主节点的node id，也就是说7004是7001的从节点，可以看出来的伐？
 
 ##添加从节点
 /usr/local/redis-3.2.0/src/redis-trib.rb add-node --slave --master-id [node id] 192.168.100.111:7002 [master ip]:[port]
