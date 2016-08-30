@@ -17,35 +17,4 @@ Ip：10.0.0.113 Port：7004,7005
 安装依赖，修改配置文件，起服务。
 redis主节点迁移，kill旧的从节点，新的从节点加入集群。
 
-命令：
-#集群检查，俩ok就是没毛病
-[root@Topaz src]# ./redis-trib.rb check 192.168.100.34:7000
-[OK] All nodes agree about slots configuration.
-[OK] All 16384 slots covered.
-注意：没加入集群的节点不能用redis-trib.rb检查，用集群的命令去检查没不在集群里的节点，得到的一定是问题。
-![](https://github.com/Topaz1618/Topaz_images/blob/master/work/I91FBMEQ%602%5B7XI%7ESYLL1X%60R.png)
-
-这里是一份儿现场演示：
-[root@Topaz src]# ps -ef|grep 7005
-root      8984     1  0 11:16 ?        00:00:00 redis-server 192.168.100.34:7005 [cluster]
-[root@Topaz src]# kill -9 8984
-[root@Topaz src]# cd /data/recluster/7005
-[root@Topaz 7005]# rm -f appendonly.aof  dump.rdb  nodes.conf
-root@Topaz 7005]# redis-server redis.conf
-[root@Topaz 7005]# ps -ef|grep 7005
-root     10563     1  0 11:46 ?        00:00:00 redis-server 192.168.100.34:7005 [cluster]
-[root@Topaz 7005]# /usr/local/redis-3.2.0/src/redis-trib.rb check 192.168.100.34:7005  
->>> Performing Cluster Check (using node 192.168.100.34:7005)
-M: d29989afbf3c14c7efdd08620ddefcf016cc9251 192.168.100.34:7005
-   slots: (0 slots) master
-   0 additional replica(s)
-[OK] All nodes agree about slots configuration.
->>> Check for open slots...
->>> Check slots coverage...
-[ERR] Not all 16384 slots are covered by nodes.
-
-#单节点检查，出现如下效果就没毛病
-[root@Topaz src]# redis-cli -h 192.168.100.34 -p 7000
-192.168.100.34:7000> 
-
 
