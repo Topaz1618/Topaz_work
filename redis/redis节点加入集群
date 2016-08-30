@@ -24,6 +24,7 @@ redis主节点迁移，kill旧的从节点，新的从节点加入集群。
 [OK] All 16384 slots covered.
 注意：没加入集群的节点不能用redis-trib.rb检查，用集群的命令去检查没不在集群里的节点，得到的一定是问题。
 ![](https://github.com/Topaz1618/Topaz_images/blob/master/work/I91FBMEQ%602%5B7XI%7ESYLL1X%60R.png)
+
 这里是一份儿现场演示：
 [root@Topaz src]# ps -ef|grep 7005
 root      8984     1  0 11:16 ?        00:00:00 redis-server 192.168.100.34:7005 [cluster]
