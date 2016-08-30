@@ -1,10 +1,9 @@
-#集群检查，俩ok就是没毛病
+##集群检查命令，俩ok就是没毛病
 [root@Topaz src]# ./redis-trib.rb check 192.168.100.34:7000
 [OK] All nodes agree about slots configuration.
 [OK] All 16384 slots covered.
-注意：没加入集群的节点不能用redis-trib.rb检查，用集群的命令去检查没不在集群里的节点，得到的一定是问题。
-如图：https://github.com/Topaz1618/Topaz_images/blob/master/work/I91FBMEQ%602%5B7XI%7ESYLL1X%60R.png
-
+注意：没加入集群的节点不能用redis-trib.rb检查，用集群的命令去检查不在集群里的节点，得到的一定是问题。
+真实的故事：https://github.com/Topaz1618/Topaz_images/blob/master/work/I91FBMEQ%602%5B7XI%7ESYLL1X%60R.png
 这里是一份儿现场演示：
 [root@Topaz src]# ps -ef|grep 7005
 root      8984     1  0 11:16 ?        00:00:00 redis-server 192.168.100.34:7005 [cluster]
@@ -24,6 +23,26 @@ M: d29989afbf3c14c7efdd08620ddefcf016cc9251 192.168.100.34:7005
 >>> Check slots coverage...
 [ERR] Not all 16384 slots are covered by nodes.
 
-#单节点检查，出现如下效果就没毛病
+##单节点检查，出现如下效果就没毛病
 [root@Topaz src]# redis-cli -h 192.168.100.34 -p 7000
 192.168.100.34:7000> 
+
+##节点node id，从属查看
+随便连个集群端口，出来了一大串子信息是不是有点懵逼呢，其实很简单
+第一列：node id
+第二列：Ip Port
+第三列：角色master或slave
+第四列：slave后接它属于的主节点的node id，也就是说7004是7001的从节点，可以看出来的伐？
+[root@Topaz src]# ./redis-cli -h 192.168.100.34 -p 7003 cluster nodes
+2705c2ed7b4fdb54c114ccafea7d9daaa0926c56 192.168.100.34:7000 master - 0 1471492700496 1 connected 0-5460
+f240c8229fc0ee044d42b03f5c4ce26d4c9517af 192.168.100.34:7004 slave 2ebe9e2cb72b9103a190afa71e3ca290ad1b6573 0 1471492699995 5 connected
+ba13cf3bde7f9540bc1531ad0cf803ffe0bf2250 192.168.100.34:7002 master - 0 1471492700996 3 connected 10923-16383
+2ebe9e2cb72b9103a190afa71e3ca290ad1b6573 192.168.100.34:7001 master - 0 1471492700496 2 connected 5461-10922
+2d053828d63cd96334b9140b408940520ba4bca6 192.168.100.34:7003 myself,slave 2705c2ed7b4fdb54c114ccafea7d9daaa0926c56 0 0 4 connected
+1ebd5c8e0b4c36a9732c6e8082287f5e2a950045 :0 slave,fail,noaddr ba13cf3bde7f9540bc1531ad0cf803ffe0bf2250 1471491985114 1471491983111 6 disconnected
+
+##添加从节点
+/usr/local/redis-3.2.0/src/redis-trib.rb add-node --slave --master-id [node id] 192.168.100.111:7002 [master ip]:[port]
+node id:主节点的node id,选谁就是谁的从节点。先执行上面的命令，看主节点的node id，另外防止有的主节点没有从节点，有的一嘟噜从节点。
+master ip:集群节点的ip
+port：任意port，这作用就是制定集群。
