@@ -47,3 +47,34 @@ node id:主节点的node id,选谁就是谁的从节点。先执行上面的命�
 master ip:集群节点的ip
 port：任意port，起到指定集群的作用。
 
+##查看所有的key
+[appmon@p2pshop1 ~]$ redis-cli -h 192.168.100.34 -p 7000
+192.168.100.34:7000> keys *
+  1) "18910989688_myCart"
+  2) "P2P_AUTHORIZATION_KEY_18613858306"
+  3) "13811487255_myCart"
+  4) "AUTHORIZATION_KEY_13552728295"
+  5) "AUTHORIZATION_KEY_15811337930"
+  6) "SystemManager.newsCatalogs"
+  7) "SystemManager.P_bottom_right"
+  8) "SystemManager.indexLeftProduct"
+  9) "AUTHORIZATION_TOKEN_537b048f4e3a450798f7fc3f7a5b95ee"
+ 10) "AUTHORIZATION_KEY_13820298659"
+ 11) "AUTHORIZATION_TOKEN_5f4e59a9fc6f4e3d90969d69d6799049"
+ 12) "AUTHORIZATION_KEY_13451089520"
+ 13) "SystemManager.M_middle"
+ 14) "AUTHORIZATION_TOKEN_c663e127e1554b129c9e559416c11bf4"
+ 15) "P2P_AUTHORIZATION_KEY_15872080806"
+ 16) "15210885453_myCart"
+ 17) "SystemManager.5908ccab8408451cdf1f783313ddd712"
+ 18) "SystemManager.M_top_center"
+ 19) "P2P_AUTHORIZATION_KEY_18610882212"
+ 20) "AUTHORIZATION_TOKEN_d201c46bdc26424d85a5420f75fed3ba"
+ 21) "P2P_AUTHORIZATION_KEY_15972407929"
+ 22) "SystemManager.areaMap"
+ 23) "SystemManager.activityMap"
+ 24) "SystemManager.noticeList"
+ 25) "SystemManager.98c7361472e2bcd37e56ee5652ae38e6"
+ 26) "P2P_AUTHORIZATION_KEY_15652667680"
+ 27) "P2P_AUTHORIZATION_KEY_15872074280"
+ 28) "15189893317_myCart"
