@@ -73,5 +73,6 @@ OK
 4) "o"
 5) "o"
 6) "s"
-127.0.0.1:6379> lpop Topaz_meow        #从左边删除）
+127.0.0.1:6379> lpop Topaz_meow        #从左边删除
 "cute"
+
