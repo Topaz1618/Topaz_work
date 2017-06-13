@@ -58,21 +58,22 @@ port：任意port，起到指定集群的作用。
   6) "SystemManager.newsCatalogs"
   7) "SystemManager.P_bottom_right"
 
-##还有些简单命令：
+============================================= 以下都不重要了，一些简单命令 ==============================================================
+
 [root@web1 redis-3.2.0]# redis-cli  #连到redis
 127.0.0.1:6379> set topaz so_cute    #添加一条数据
 OK
 127.0.0.1:6379> get topaz           #取值
 "so_cute"
-127.0.0.1:6379> lpush Topaz_meow s o o o o cute   #另一种存取数据的方式（这是从左边开始，还有rpush从右边）
+127.0.0.1:6379> lpush Topaz_meow s o cute   #另一种存取数据的方式（这是从左边开始，还有rpush从右边）
 (integer) 6
 127.0.0.1:6379> lrange Topaz_meow 0 -1             #这个跟列表唯一区别是-1可以包含最后一个
 1) "cute"
 2) "o"
-3) "o"
-4) "o"
-5) "o"
-6) "s"
+3) "s"
 127.0.0.1:6379> lpop Topaz_meow        #从左边删除
 "cute"
+
+（以后有空再更新~ ）
+
 
