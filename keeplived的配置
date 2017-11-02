@@ -1,0 +1,47 @@
+[root@shopdb1 ~]# cat /etc/keepalived/keepalived.conf
+! Configuration File for keepalived
+global_defs {
+   notification_email {		#报警，一般不启用
+     acassen@firewall.loc
+     failover@firewall.loc
+     sysadmin@firewall.loc
+   }
+   notification_email_from Alexandre.Cassen@firewall.loc
+   smtp_server 192.168.200.1
+   smtp_connect_timeout 30
+   router_id LVS_DEVEL
+   vrrp_skip_check_adv_addr
+   vrrp_strict
+}
+
+vrrp_instance VI_1 {		#起一个实例，VI_1：实例名称
+    state MASTER			#角色状态	主备要不同
+    interface eth0			#通信接口
+    virtual_router_id 51	#实例id号，主备要相同
+    priority 100			#优先级，数字越大权利越大，主备要不同
+    advert_int 1			#心跳间隔时间
+    authentication {		#加密认证
+        auth_type PASS	#明文
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.100.70	#Vip
+    }
+}
+virtual_server 192.168.100.70 3306 {	#设置VIP和端口
+    delay_loop 2		# service polling的delay时间，即服务轮询的时间间隔
+    lb_algo wrr			
+    lb_kind NAT
+    persistence_timeout 50
+    protocol TCP
+    real_server 192.168.100.57 3306 {	#real server Ip和端口
+        weight 3		#权重
+        notify_down /opt/mysql/mysql.sh
+        TCP_CHECK {			#健康检查方式
+            connect_timeout 10
+            nb_get_retry 3
+            delay_before_retry 3
+            connect_port 3306
+        }
+    }
+}
