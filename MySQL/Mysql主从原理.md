@@ -4,33 +4,32 @@
 ## 涉及到的文件
     主库：mysql-bin.00000X、mysql-bin.index
     从库：relay-log.00000X、master.info
-## 主从工作流程简单版
+## 主从原理简单版
     start slave之后，主从开始工作
     1.从库io线程读取master.info,拿到ip，用户名，密码，binglog位置点去连接主库
     2.主库binlogdump线程进行验证，验证通过去找binlog文件位置点，向下读取，并发送binlog内容，读到了哪个文件，以及下一个位置点
     3.从库io线程接到返回，把binlog内容写到relay-log里，把位置点写到master.info里
     4.sql线程实时观察relay-log里面是不是有新内容，有就解析成sql语句，按照主库写入的顺序写入到从库里
-## 主从同步工作流程详细版
+## 主从原理详细版
     从库start slave之后，主从开始工作
-    1.从库io线程请求数据 (由入口函数handle_slave_io()处理)：
+    1.从库io线程请求数据 (交由handle_slave_io()处理,以下是处理流程)：
     	1）my_thread_init()  ==> 线程初始化
     	2）safe_connect() ==> 以标准方式连接到数据库
     	3）register_slave_on_master() ==> 带着slave_id，IP，端口，用户名把自己注册到主库上
     	4）request_dump() ==> 判断是否为GTID(基于全局事务标识符复制)，不是就把master log file和Pos传给主库，请求binlog数据，并执行COM_BINLOG_DUMP命令
-    2.主库发送数据  (由dispatch_command() 函数进行处理)
-    	1） 接收到slave的COM_BINLOG_DUMP命令
-    		- COM_BINLOG_DUMP()生成一个binlog dump线程
-    		- kill_zombie_dump_threads() ==> 重复的slave_id来注册时移除它的binlog dump线程
-    		- mysql_binlog_send()	==> 打开文件，根据slave发来的信息在指定位置读取文件，将event按照顺序发给slave
-    3.从库io线程接受数据 （由handle_slave_io()处理）
+    2.主库发送数据  (由dispatch_command() 函数处理，以下是处理流程)
+        1）接收到slave的COM_BINLOG_DUMP命令，找到COM_BINLOG_DUMP()，生成一个binlog dump线程
+        2）kill_zombie_dump_threads() ==> 重复的slave_id来注册时移除它的binlog dump线程
+        3）mysql_binlog_send()	==> 打开文件，根据slave发来的信息在指定位置读取文件，将event按照顺序发给slave(binlog dump线程的活儿)
+    3.从库io线程接受数据 （由handle_slave_io()处理，以下是处理流程）
     	1）read_event() ==> 读取event并存放到本地relay log中,等待主库将binlog数据发过来
     	2）queue_event()  ==>  将接收到的event保存在relaylog中
-    4.主库sql线程读取&应用日志（ handle_slave_sql()处理）
-    	1）读取 exec_relay_log_event()
+    4.从库sql线程读取&应用日志（ handle_slave_sql()处理，以下是处理流程）
+    	1）exec_relay_log_event() 读取 
     		- next_event()     ==> 从cache或者relaylog中读取event
     		- sql_slave_killed() ==> 只要线程未kill则一直执行 
     		- append_item_to_jobs() ==> 发送给workers线程
-    	2）应用  handle_slave_worker()    #实际是while循环slave_worker_exec_job_group()函数
+    	2）handle_slave_worker()应用      #实际是while循环slave_worker_exec_job_group()函数
     		- pop_jobs_item(worker, job_item)	==> 获得具体的event，会阻塞等待
     		- do_apply_event_worker() ==> 调用该函数应用event
     			- do_apply_event()   ==> 利用C++多态性执行对应的event，将不同的 event 操作在备机上重一遍（二进制解析成sql语句）
