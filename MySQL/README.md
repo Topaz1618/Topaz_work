@@ -5,6 +5,8 @@
 <h5> Mysql数据不同步的原因检查和解决</h5>
 <h5> Mysql基本操作</h5>
   <a style="display:block;color:red" href="http://www.baidu.com">积极</a>  
-  
+ <div style="color:red">
+  <a href="http://www.baidu.com">积极</a>  
+ </div>
   </html>
 </body>
