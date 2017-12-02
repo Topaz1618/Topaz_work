@@ -1,46 +1,27 @@
-## MySQL主从备份原理
-
+## MySQL主从备份
+### 主从 my.cnf 配置
+    修改port与master不同	==> port=3307 port=3308
+    修改servver-id与master不同 ==> server-id=1 server-id=2
+    修改datadir与master不同 ==> datadir = /application/master/data/Data  datadir = /application/slave/data/Data 
+    从库只读设置==> mysql>set global read_only=1;  #read_only=1只读模式，可以限定普通用户进行数据修改的操作，但不会限定具有super权限的用户（如超级管理员root用户）的数据修改操作
 ### 主从同步两种情况
 #### 从0开始
-    不需要管了
+    直接导入就ok
 #### 主库内已有数据
     - 配置主从同步需要锁表，不要让外面再写了，记录binlog后就可以解锁
     - 让已有数据一致（数据拷到从库）
     - 从库根据binlog位置开始同步
-### 主库
-    1.用户写入数据到数据，同时也会写到binlog文件里(从库要打开binlog才会写)
-      - mysql通过读索引文件mysql-index确定写到哪个binlog文件里
-      - binlog文件大小：默认1.1G
-      - 日志名格式，mysql-bin.00000X
-      - binlog只记录更改的内容：insert/update/delete/alter/create/alter
-    2.主库创建用于同步的用户 rep@10.0.0.0/24，只赋同步权限
-    3.主库有个io线程
- ### 从库
-    1.从库有两个线程io,sql
-    2.从库有个master.info文件
-      - 同步change master 设置io线程连接主库的用户名，密码，binlog位置点
-    3.start slave 从库开始同步主库
-    4.从库有个relay-log.00000x(和主库的binlog文件类似，也自动切割)，通过relay-index索引
-
-### 主从同步工作过程
-    start slave之后，主从开始工作
-    1.从库io线程读取master.info,拿到ip，用户名，密码，binglog位置点去连接主库
-    2.主库io线程进行验证，验证通过去找binlog文件位置点，向下读取，并发送binlog内容，读到了哪个文件，以及下一个位置点
-    3.从库io线程接到返回，把binlog内容写到relay-log里，把位置点写到master.info里
-    4.sql线程实时观察relay-log里面是不是有新内容，有就解析成sql语句，按照主库写入的顺序写入到从库里
-    
     
 ## 操作
-    - mysql支持单向，双向，链式，写主，从库接受来自主服务器binlog文件的日志内容，解析出sql重新更新到从服务器，使得主从服务器数据达到一致
-    - 从库不能大于五个
-    [root@test ~]# egrep "log-bin|server-id" /data/3306/my.cnf 	#主库开log-bin
+### 修改server-id
+    [root@test ~]# egrep "log-bin|server-id" /data/3306/my.cnf 	#主库开log-bin
     log-bin = /data/3306/mysql-bin								
     server-id = 1											#所有server-id实例都不能一样
     [root@test ~]# egrep "log-bin|server-id" /data/3307/my.cnf 
     #log-bin = /data/3307/mysql-bin
     server-id = 3
-    
-    主库
+    
+### 主库操作
     mysql> show variables;		#主库查看数据库配置的参数，相当于my.cnf，但是更多
     mysql> show variables like "log_bin";	
     +---------------+-------+
@@ -71,8 +52,8 @@
     mysqldump -uroot -pdog123 -S /data/3306/mysql.sock -A -B|gzip>/opt/bak_$(date +%F).sql.gz
     mysql> unlock tables;						#解锁
     
-    
-    从库：
+    
+### 从库操作
     [root@test ~]# mysql -uroot -pdog123 -S /data/3306/mysql.sock </opt/bak_2015-10-21.sql 
     #了解下binlog
     [root@test ~]# ll /data/3306/			#000001就是binlog日志
