@@ -14,7 +14,7 @@
     
 ## 操作
 ### 修改server-id
-    [root@test ~]# egrep "log-bin|server-id" /data/3306/my.cnf 	#主库开log-bin
+    [root@test ~]# egrep "log-bin|server-id" /data/3306/my.cnf 	#主库开log-bin
     log-bin = /data/3306/mysql-bin								
     server-id = 1											#所有server-id实例都不能一样
     [root@test ~]# egrep "log-bin|server-id" /data/3307/my.cnf 
